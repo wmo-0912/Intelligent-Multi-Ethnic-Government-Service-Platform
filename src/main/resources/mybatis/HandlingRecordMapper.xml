@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.govservice.mapper.HandlingRecordMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="HandlingRecordResultMap" type="com.example.govservice.entity.HandlingRecord">
+        <id column="RecordID" property="recordId"/>
+        <result column="UserID" property="userId"/>
+        <result column="ItemID" property="itemId"/>
+        <result column="Status" property="status"/>
+        <result column="SubmitTime" property="submitTime"/>
+        <result column="HandleResult" property="handleResult"/>
+        <result column="HandleTime" property="handleTime"/>
+        <result column="HandleUserID" property="handleUserId"/>
+        <result column="ApplicationMaterials" property="applicationMaterials"/>
+    </resultMap>
+
+    <!-- 根据记录ID查询记录 -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="HandlingRecordResultMap">
+        SELECT * FROM HandlingRecord WHERE RecordID = #{recordId}
+    </select>
+
+    <!-- 根据用户ID查询申请记录 -->
+    <select id="selectByUserId" parameterType="java.lang.Integer" resultMap="HandlingRecordResultMap">
+        SELECT * FROM HandlingRecord WHERE UserID = #{userId} ORDER BY SubmitTime DESC
+    </select>
+
+    <!-- 根据事项ID查询申请记录 -->
+    <select id="selectByItemId" parameterType="java.lang.Integer" resultMap="HandlingRecordResultMap">
+        SELECT * FROM HandlingRecord WHERE ItemID = #{itemId} ORDER BY SubmitTime DESC
+    </select>
+
+    <!-- 查询待处理的申请记录 -->
+    <select id="selectPendingRecords" resultMap="HandlingRecordResultMap">
+        SELECT * FROM HandlingRecord WHERE Status = '待处理' ORDER BY SubmitTime ASC
+    </select>
+
+    <!-- 根据状态查询申请记录 -->
+    <select id="selectByStatus" parameterType="java.lang.String" resultMap="HandlingRecordResultMap">
+        SELECT * FROM HandlingRecord WHERE Status = #{status} ORDER BY SubmitTime DESC
+    </select>
+
+    <!-- 查询所有申请记录 -->
+    <select id="selectAll" resultMap="HandlingRecordResultMap">
+        SELECT * FROM HandlingRecord ORDER BY SubmitTime DESC
+    </select>
+
+    <!-- 插入申请记录 -->
+    <insert id="insert" parameterType="com.example.govservice.entity.HandlingRecord" useGeneratedKeys="true" keyProperty="recordId">
+        INSERT INTO HandlingRecord (UserID, ItemID, Status, SubmitTime, ApplicationMaterials)
+        VALUES (#{userId}, #{itemId}, #{status}, #{submitTime}, #{applicationMaterials})
+    </insert>
+
+    <!-- 更新申请记录 -->
+    <update id="update" parameterType="com.example.govservice.entity.HandlingRecord">
+        UPDATE HandlingRecord SET
+            UserID = #{userId},
+            ItemID = #{itemId},
+            Status = #{status},
+            SubmitTime = #{submitTime},
+            HandleResult = #{handleResult},
+            HandleTime = #{handleTime},
+            HandleUserID = #{handleUserId},
+            ApplicationMaterials = #{applicationMaterials}
+        WHERE RecordID = #{recordId}
+    </update>
+
+    <!-- 更新申请状态 -->
+    <update id="updateStatus">
+        UPDATE HandlingRecord SET
+            Status = #{status},
+            HandleResult = #{handleResult},
+            HandleTime = NOW(),
+            HandleUserID = #{handleUserId}
+        WHERE RecordID = #{recordId}
+    </update>
+
+    <!-- 根据记录ID删除记录 -->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM HandlingRecord WHERE RecordID = #{recordId}
+    </delete>
+
+    <!-- 统计办理量 -->
+    <select id="countByItemId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM HandlingRecord WHERE ItemID = #{itemId}
+    </select>
+
+    <!-- 统计通过量 -->
+    <select id="countCompletedByItemId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM HandlingRecord WHERE ItemID = #{itemId} AND Status = '已完成'
+    </select>
+
+</mapper>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.govservice.mapper.FaqMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="FaqResultMap" type="com.example.govservice.entity.Faq">
+        <id column="QuestionID" property="questionId"/>
+        <result column="ItemID" property="itemId"/>
+        <result column="Question" property="question"/>
+        <result column="Answer" property="answer"/>
+        <result column="LanguageType" property="languageType"/>
+        <result column="VisitCount" property="visitCount"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+
+    <!-- 根据问题ID查询FAQ -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="FaqResultMap">
+        SELECT * FROM FAQ WHERE QuestionID = #{questionId}
+    </select>
+
+    <!-- 根据事项ID查询FAQ -->
+    <select id="selectByItemId" parameterType="java.lang.Integer" resultMap="FaqResultMap">
+        SELECT * FROM FAQ WHERE ItemID = #{itemId} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据事项ID和语种查询FAQ -->
+    <select id="selectByItemIdAndLanguage" resultMap="FaqResultMap">
+        SELECT * FROM FAQ WHERE ItemID = #{itemId} AND LanguageType = #{languageType} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据语种查询FAQ -->
+    <select id="selectByLanguageType" parameterType="java.lang.String" resultMap="FaqResultMap">
+        SELECT * FROM FAQ WHERE LanguageType = #{languageType} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据关键词搜索FAQ -->
+    <select id="searchByKeyword" resultMap="FaqResultMap">
+        SELECT * FROM FAQ 
+        WHERE (Question LIKE CONCAT('%', #{keyword}, '%') OR Answer LIKE CONCAT('%', #{keyword}, '%'))
+        <if test="languageType != null and languageType != ''">
+            AND LanguageType = #{languageType}
+        </if>
+        ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 查询所有FAQ -->
+    <select id="selectAll" resultMap="FaqResultMap">
+        SELECT * FROM FAQ ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 插入FAQ -->
+    <insert id="insert" parameterType="com.example.govservice.entity.Faq" useGeneratedKeys="true" keyProperty="questionId">
+        INSERT INTO FAQ (ItemID, Question, Answer, LanguageType, VisitCount, CreateTime, UpdateTime)
+        VALUES (#{itemId}, #{question}, #{answer}, #{languageType}, #{visitCount}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 更新FAQ -->
+    <update id="update" parameterType="com.example.govservice.entity.Faq">
+        UPDATE FAQ SET
+            ItemID = #{itemId},
+            Question = #{question},
+            Answer = #{answer},
+            LanguageType = #{languageType},
+            VisitCount = #{visitCount},
+            UpdateTime = #{updateTime}
+        WHERE QuestionID = #{questionId}
+    </update>
+
+    <!-- 根据问题ID删除FAQ -->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM FAQ WHERE QuestionID = #{questionId}
+    </delete>
+
+    <!-- 根据事项ID删除FAQ -->
+    <delete id="deleteByItemId" parameterType="java.lang.Integer">
+        DELETE FROM FAQ WHERE ItemID = #{itemId}
+    </delete>
+
+    <!-- 增加访问次数 -->
+    <update id="incrementVisitCount" parameterType="java.lang.Integer">
+        UPDATE FAQ SET VisitCount = VisitCount + 1 WHERE QuestionID = #{questionId}
+    </update>
+
+    <!-- 统计FAQ访问量 -->
+    <select id="countVisitByItemId" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+        SELECT SUM(VisitCount) FROM FAQ WHERE ItemID = #{itemId}
+    </select>
+
+    <!-- 统计FAQ访问量（按语种） -->
+    <select id="countVisitByLanguageType" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT SUM(VisitCount) FROM FAQ WHERE LanguageType = #{languageType}
+    </select>
+
+</mapper>

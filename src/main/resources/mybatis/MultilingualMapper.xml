@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.govservice.mapper.MultilingualMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="MultilingualInfoResultMap" type="com.example.govservice.entity.MultilingualInfo">
+        <id column="LanguageID" property="languageId"/>
+        <result column="ItemID" property="itemId"/>
+        <result column="LanguageType" property="languageType"/>
+        <result column="ItemNameTrans" property="itemNameTrans"/>
+        <result column="RequirementTrans" property="requirementTrans"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+
+    <!-- 根据语言ID查询多语言信息 -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="MultilingualInfoResultMap">
+        SELECT * FROM MultilingualInfo WHERE LanguageID = #{languageId}
+    </select>
+
+    <!-- 根据事项ID和语种查询多语言信息 -->
+    <select id="selectByItemIdAndLanguage" resultMap="MultilingualInfoResultMap">
+        SELECT * FROM MultilingualInfo WHERE ItemID = #{itemId} AND LanguageType = #{languageType}
+    </select>
+
+    <!-- 根据事项ID查询所有语种的多语言信息 -->
+    <select id="selectByItemId" parameterType="java.lang.Integer" resultMap="MultilingualInfoResultMap">
+        SELECT * FROM MultilingualInfo WHERE ItemID = #{itemId} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据语种查询所有多语言信息 -->
+    <select id="selectByLanguageType" parameterType="java.lang.String" resultMap="MultilingualInfoResultMap">
+        SELECT * FROM MultilingualInfo WHERE LanguageType = #{languageType} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 查询所有多语言信息 -->
+    <select id="selectAll" resultMap="MultilingualInfoResultMap">
+        SELECT * FROM MultilingualInfo ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 插入多语言信息 -->
+    <insert id="insert" parameterType="com.example.govservice.entity.MultilingualInfo" useGeneratedKeys="true" keyProperty="languageId">
+        INSERT INTO MultilingualInfo (ItemID, LanguageType, ItemNameTrans, RequirementTrans, CreateTime, UpdateTime)
+        VALUES (#{itemId}, #{languageType}, #{itemNameTrans}, #{requirementTrans}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 更新多语言信息 -->
+    <update id="update" parameterType="com.example.govservice.entity.MultilingualInfo">
+        UPDATE MultilingualInfo SET
+            ItemID = #{itemId},
+            LanguageType = #{languageType},
+            ItemNameTrans = #{itemNameTrans},
+            RequirementTrans = #{requirementTrans},
+            UpdateTime = #{updateTime}
+        WHERE LanguageID = #{languageId}
+    </update>
+
+    <!-- 根据语言ID删除多语言信息 -->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM MultilingualInfo WHERE LanguageID = #{languageId}
+    </delete>
+
+    <!-- 根据事项ID删除多语言信息 -->
+    <delete id="deleteByItemId" parameterType="java.lang.Integer">
+        DELETE FROM MultilingualInfo WHERE ItemID = #{itemId}
+    </delete>
+
+    <!-- 检查事项和语种的翻译是否存在 -->
+    <select id="checkTranslationExists" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM MultilingualInfo WHERE ItemID = #{itemId} AND LanguageType = #{languageType}
+    </select>
+
+</mapper>

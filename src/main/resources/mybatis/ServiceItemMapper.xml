@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.govservice.mapper.ServiceItemMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="ServiceItemResultMap" type="com.example.govservice.entity.ServiceItem">
+        <id column="ItemID" property="itemId"/>
+        <result column="ItemName" property="itemName"/>
+        <result column="DepartmentName" property="departmentName"/>
+        <result column="HandleRequirement" property="handleRequirement"/>
+        <result column="IsEnabled" property="isEnabled"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+
+    <!-- 根据事项ID查询事项 -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="ServiceItemResultMap">
+        SELECT * FROM ServiceItem WHERE ItemID = #{itemId}
+    </select>
+
+    <!-- 查询所有启用的事项 -->
+    <select id="selectAllEnabled" resultMap="ServiceItemResultMap">
+        SELECT * FROM ServiceItem WHERE IsEnabled = TRUE ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 查询所有事项 -->
+    <select id="selectAll" resultMap="ServiceItemResultMap">
+        SELECT * FROM ServiceItem ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据部门查询事项 -->
+    <select id="selectByDepartment" parameterType="java.lang.String" resultMap="ServiceItemResultMap">
+        SELECT * FROM ServiceItem WHERE DepartmentName = #{departmentName} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据部门查询启用的事项 -->
+    <select id="selectEnabledByDepartment" parameterType="java.lang.String" resultMap="ServiceItemResultMap">
+        SELECT * FROM ServiceItem WHERE DepartmentName = #{departmentName} AND IsEnabled = TRUE ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 插入事项 -->
+    <insert id="insert" parameterType="com.example.govservice.entity.ServiceItem" useGeneratedKeys="true" keyProperty="itemId">
+        INSERT INTO ServiceItem (ItemName, DepartmentName, HandleRequirement, IsEnabled, CreateTime, UpdateTime)
+        VALUES (#{itemName}, #{departmentName}, #{handleRequirement}, #{isEnabled}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 更新事项信息 -->
+    <update id="update" parameterType="com.example.govservice.entity.ServiceItem">
+        UPDATE ServiceItem SET
+            ItemName = #{itemName},
+            DepartmentName = #{departmentName},
+            HandleRequirement = #{handleRequirement},
+            IsEnabled = #{isEnabled},
+            UpdateTime = #{updateTime}
+        WHERE ItemID = #{itemId}
+    </update>
+
+    <!-- 启用/禁用事项 -->
+    <update id="updateStatus">
+        UPDATE ServiceItem SET
+            IsEnabled = #{isEnabled},
+            UpdateTime = NOW()
+        WHERE ItemID = #{itemId}
+    </update>
+
+    <!-- 根据事项ID删除事项 -->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM ServiceItem WHERE ItemID = #{itemId}
+    </delete>
+
+</mapper>

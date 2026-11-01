@@ -1,0 +1,68 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    # 替换为你的数据库名、用户名、密码
+    url: jdbc:mysql://localhost:3306/govservice?allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC
+    username: root
+    password: wangmo233
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis:
+  mapper-locations: classpath:mybatis/**/*.xml  # MyBatis映射文件路径
+  type-aliases-package: com.example.govservice.entity  # 实体类所在包路径
+  configuration:
+    map-underscore-to-camel-case: true  # 开启驼峰命名转换
+
+# 服务器配置
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+# 日志配置
+logging:
+  level:
+    com.example.govservice.mapper: debug  # 打印SQL语句
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# 文件上传配置
+file:
+  upload:
+    dir: uploads  # 文件上传目录，可配置为绝对路径
+    max-size: 10485760  # 最大文件大小 10MB
+
+# AI智能回答服务配置
+ai:
+  service:
+    enabled: true  # 是否启用AI服务，设置为true启用
+    provider: zhipu  # AI服务提供商: local(本地规则引擎-完全免费无需API), zhipu(智谱AI-每天3000次免费), alibaba(阿里通义-每天3000次免费), baidu(百度文心), openai(ChatGPT), custom(自定义)
+    api-key: "b5b7577e44294109870290e782d460b9.phstP0Y9Fx43CDpY"  # 智谱AI的API密钥
+    secret-key: ""  # 部分服务需要Secret Key（如百度），v2版本通常不需要
+    url: ""  # 自定义服务URL（仅provider=custom时使用）
+    timeout: 30000  # 请求超时时间（毫秒），AI服务通常需要更长时间
+
+# Swagger/OpenAPI配置
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  group-configs:
+    - group: '用户管理'
+      paths-to-match: '/api/user/**'
+    - group: '政务事项'
+      paths-to-match: '/api/service-item/**'
+    - group: '文件管理'
+      paths-to-match: '/api/file/**'
+    - group: '通知消息'
+      paths-to-match: '/api/notification/**'
+    - group: '多语言'
+      paths-to-match: '/api/multilingual/**'
+    - group: 'FAQ'
+      paths-to-match: '/api/faq/**'

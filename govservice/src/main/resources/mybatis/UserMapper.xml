@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.govservice.mapper.UserMapper">
+
+    <!-- 结果映射 -->
+    <resultMap id="UserResultMap" type="com.example.govservice.entity.User">
+        <id column="UserID" property="userId"/>
+        <result column="Name" property="name"/>
+        <result column="Ethnicity" property="ethnicity"/>
+        <result column="PhoneNumber" property="phoneNumber"/>
+        <result column="Account" property="account"/>
+        <result column="Password" property="password"/>
+        <result column="Role" property="role"/>
+        <result column="RealNameVerified" property="realNameVerified"/>
+        <result column="Frozen" property="frozen"/>
+        <result column="CreateTime" property="createTime"/>
+        <result column="UpdateTime" property="updateTime"/>
+    </resultMap>
+
+    <!-- 根据用户ID查询用户 -->
+    <select id="selectById" parameterType="java.lang.Integer" resultMap="UserResultMap">
+        SELECT * FROM User WHERE UserID = #{userId}
+    </select>
+
+    <!-- 根据账号查询用户 -->
+    <select id="selectByAccount" parameterType="java.lang.String" resultMap="UserResultMap">
+        SELECT * FROM User WHERE Account = #{account}
+    </select>
+
+    <!-- 根据手机号查询用户 -->
+    <select id="selectByPhoneNumber" parameterType="java.lang.String" resultMap="UserResultMap">
+        SELECT * FROM User WHERE PhoneNumber = #{phoneNumber}
+    </select>
+
+    <!-- 查询所有用户 -->
+    <select id="selectAll" resultMap="UserResultMap">
+        SELECT * FROM User ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 根据角色查询用户 -->
+    <select id="selectByRole" parameterType="java.lang.String" resultMap="UserResultMap">
+        SELECT * FROM User WHERE Role = #{role} ORDER BY CreateTime DESC
+    </select>
+
+    <!-- 插入用户 -->
+    <insert id="insert" parameterType="com.example.govservice.entity.User" useGeneratedKeys="true" keyProperty="userId">
+        INSERT INTO User (Name, Ethnicity, PhoneNumber, Account, Password, Role, RealNameVerified, Frozen, CreateTime, UpdateTime)
+        VALUES (#{name}, #{ethnicity}, #{phoneNumber}, #{account}, #{password}, #{role}, #{realNameVerified}, #{frozen}, #{createTime}, #{updateTime})
+    </insert>
+
+    <!-- 更新用户信息 -->
+    <update id="update" parameterType="com.example.govservice.entity.User">
+        UPDATE User SET
+            Name = #{name},
+            Ethnicity = #{ethnicity},
+            PhoneNumber = #{phoneNumber},
+            Account = #{account},
+            Password = #{password},
+            Role = #{role},
+            RealNameVerified = #{realNameVerified},
+            Frozen = #{frozen},
+            UpdateTime = #{updateTime}
+        WHERE UserID = #{userId}
+    </update>
+
+    <!-- 根据用户ID删除用户 -->
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        DELETE FROM User WHERE UserID = #{userId}
+    </delete>
+
+    <!-- 检查账号是否存在 -->
+    <select id="checkAccountExists" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM User WHERE Account = #{account}
+    </select>
+
+    <!-- 检查手机号是否存在 -->
+    <select id="checkPhoneNumberExists" parameterType="java.lang.String" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM User WHERE PhoneNumber = #{phoneNumber}
+    </select>
+
+</mapper>
